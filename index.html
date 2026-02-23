@@ -13,12 +13,14 @@
         font-family: 'Arial', sans-serif;
         overflow: hidden;
     }
+
     .container {
         display: flex;
         flex-direction: row;
         height: 100vh;
         width: 100vw;
     }
+
     /* Joysticks */
     .joystick-left, .joystick-right {
         flex: 1;
@@ -26,6 +28,7 @@
         justify-content: center;
         align-items: center;
     }
+
     .joystick-base {
         width: 160px;
         height: 160px;
@@ -34,8 +37,8 @@
         border: 3px solid #fff;
         position: relative;
         box-shadow: 0 0 20px #000 inset;
-        touch-action: none;
     }
+
     .joystick-knob {
         width: 60px;
         height: 60px;
@@ -45,9 +48,11 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        transition: left 0.05s, top 0.05s;
         box-shadow: 0 0 15px #ffcc00;
         touch-action: none;
     }
+
     /* Central Screen + Dashboard */
     .central-screen {
         flex: 2;
@@ -60,6 +65,7 @@
         border-right: 2px solid #555;
         padding: 10px;
     }
+
     .central-screen video {
         width: 85%;
         height: auto;
@@ -67,12 +73,14 @@
         border-radius: 8px;
         box-shadow: 0 0 20px #ffcc00;
     }
+
     .button-row {
         display: flex;
         justify-content: space-around;
         width: 90%;
         margin-top: 15px;
     }
+
     button {
         padding: 12px 18px;
         background: #222;
@@ -84,17 +92,20 @@
         transition: all 0.2s;
         box-shadow: 0 0 10px #000 inset;
     }
+
     button:active {
         box-shadow: 0 0 20px #ffcc00;
         background: #333;
         transform: scale(0.95);
     }
+
     .dashboard {
         display: flex;
         justify-content: space-around;
         width: 90%;
         margin-top: 15px;
     }
+
     .dashboard div {
         padding: 5px 12px;
         background: #222;
@@ -104,6 +115,7 @@
         min-width: 100px;
         box-shadow: 0 0 15px #ffcc00 inset;
     }
+
     .telemetry-bar {
         height: 15px;
         background: #333;
@@ -112,6 +124,7 @@
         position: relative;
         overflow: hidden;
     }
+
     .telemetry-fill {
         height: 100%;
         background: #ffcc00;
@@ -178,13 +191,13 @@
 <script>
 const serverUrl = "http://192.168.4.1"; // Replace with your ESP32 IP
 
-// Send command to ESP32
+// Send command
 function sendCommand(cmd) {
     fetch(`${serverUrl}/command?cmd=${cmd}`)
     .catch(err => console.log("Error:", err));
 }
 
-// Live stream setup
+// Live stream
 const liveStream = document.getElementById("liveStream");
 liveStream.src = `${serverUrl}/stream`;
 
@@ -221,21 +234,20 @@ function sendJoystickData(axisX, xValue, axisY, yValue) {
     .catch(err => console.log("Joystick Error:", err));
 }
 
-// Initialize joysticks
 setupJoystick("joystickLeft", "knobLeft", "pitch", "roll");
 setupJoystick("joystickRight", "knobRight", "throttle", "yaw");
 
-// Dashboard update function
+// Dashboard update
 function updateDashboard(battery, altitude, mode, status) {
     document.getElementById("battery").innerText = battery + "%";
     document.getElementById("batteryFill").style.width = battery + "%";
     document.getElementById("altitude").innerText = altitude + " m";
-    document.getElementById("altitudeFill").style.width = Math.min(100, altitude*2) + "%";
+    document.getElementById("altitudeFill").style.width = Math.min(100, altitude*2) + "%"; // normalize
     document.getElementById("mode").innerText = mode;
     document.getElementById("status").innerText = status;
 }
 
-// Simulate telemetry updates (replace with real ESP32 fetch)
+// Example: simulate telemetry updates (replace with real ESP32 fetch)
 setInterval(() => {
     const battery = Math.floor(Math.random()*100);
     const altitude = Math.floor(Math.random()*50);
@@ -244,6 +256,5 @@ setInterval(() => {
     updateDashboard(battery, altitude, modes[Math.floor(Math.random()*modes.length)], statusList[Math.floor(Math.random()*statusList.length)]);
 }, 1000);
 </script>
-
 </body>
-  </html>
+            </html>
