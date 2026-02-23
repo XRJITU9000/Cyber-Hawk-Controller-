@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER HAWK Game Controller</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #0a0a0a;
+        color: #fff;
+        font-family: 'Arial', sans-serif;
+        overflow: hidden;
+    }
+    .container {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+        width: 100vw;
+    }
+    /* Joysticks */
+    .joystick-left, .joystick-right {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .joystick-base {
+        width: 160px;
+        height: 160px;
+        background: #222;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        position: relative;
+        box-shadow: 0 0 20px #000 inset;
+        touch-action: none;
+    }
+    .joystick-knob {
+        width: 60px;
+        height: 60px;
+        background: #ffcc00;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 15px #ffcc00;
+        touch-action: none;
+    }
+    /* Central Screen + Dashboard */
+    .central-screen {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        background: #111;
+        border-left: 2px solid #555;
+        border-right: 2px solid #555;
+        padding: 10px;
+    }
+    .central-screen video {
+        width: 85%;
+        height: auto;
+        border: 3px solid #ffcc00;
+        border-radius: 8px;
+        box-shadow: 0 0 20px #ffcc00;
+    }
+    .button-row {
+        display: flex;
+        justify-content: space-around;
+        width: 90%;
+        margin-top: 15px;
+    }
+    button {
+        padding: 12px 18px;
+        background: #222;
+        color: #fff;
+        border: 2px solid #ffcc00;
+        border-radius: 12px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 0 10px #000 inset;
+    }
+    button:active {
+        box-shadow: 0 0 20px #ffcc00;
+        background: #333;
+        transform: scale(0.95);
+    }
+    .dashboard {
+        display: flex;
+        justify-content: space-around;
+        width: 90%;
+        margin-top: 15px;
+    }
+    .dashboard div {
+        padding: 5px 12px;
+        background: #222;
+        border: 2px solid #ffcc00;
+        border-radius: 10px;
+        text-align: center;
+        min-width: 100px;
+        box-shadow: 0 0 15px #ffcc00 inset;
+    }
+    .telemetry-bar {
+        height: 15px;
+        background: #333;
+        border-radius: 8px;
+        margin-top: 5px;
+        position: relative;
+        overflow: hidden;
+    }
+    .telemetry-fill {
+        height: 100%;
+        background: #ffcc00;
+        width: 0%;
+        border-radius: 8px;
+        transition: width 0.5s ease;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Left Joystick -->
+    <div class="joystick-left">
+        <div class="joystick-base" id="joystickLeft">
+            <div class="joystick-knob" id="knobLeft"></div>
+        </div>
+    </div>
+
+    <!-- Central Screen + Dashboard -->
+    <div class="central-screen">
+        <video id="liveStream" autoplay muted></video>
+
+        <!-- Buttons -->
+        <div class="button-row">
+            <button id="armBtn" onclick="sendCommand('ARM')">ARM</button>
+            <button id="disarmBtn" onclick="sendCommand('DISARM')">DISARM</button>
+            <button id="ledBtn" onclick="sendCommand('LED')">LED</button>
+            <button id="flipBtn" onclick="sendCommand('FLIP')">FLIP</button>
+            <button id="rthBtn" onclick="sendCommand('RTH')">RTH</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div>
+                Battery
+                <div class="telemetry-bar"><div id="batteryFill" class="telemetry-fill"></div></div>
+                <span id="battery">100%</span>
+            </div>
+            <div>
+                Altitude
+                <div class="telemetry-bar"><div id="altitudeFill" class="telemetry-fill"></div></div>
+                <span id="altitude">0 m</span>
+            </div>
+            <div>
+                Mode
+                <span id="mode">STANDBY</span>
+            </div>
+            <div>
+                Status
+                <span id="status">OK</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Joystick -->
+    <div class="joystick-right">
+        <div class="joystick-base" id="joystickRight">
+            <div class="joystick-knob" id="knobRight"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const serverUrl = "http://192.168.4.1"; // Replace with your ESP32 IP
+
+// Send command to ESP32
+function sendCommand(cmd) {
+    fetch(`${serverUrl}/command?cmd=${cmd}`)
+    .catch(err => console.log("Error:", err));
+}
+
+// Live stream setup
+const liveStream = document.getElementById("liveStream");
+liveStream.src = `${serverUrl}/stream`;
+
+// Joystick logic
+function setupJoystick(baseId, knobId, axisX, axisY) {
+    const base = document.getElementById(baseId);
+    const knob = document.getElementById(knobId);
+    let dragging = false;
+
+    knob.addEventListener('pointerdown', e => { dragging = true; });
+    document.addEventListener('pointerup', e => {
+        dragging = false;
+        knob.style.left = "50%";
+        knob.style.top = "50%";
+        sendJoystickData(axisX, 0, axisY, 0);
+    });
+
+    document.addEventListener('pointermove', e => {
+        if(!dragging) return;
+        const rect = base.getBoundingClientRect();
+        let x = e.clientX - rect.left - knob.offsetWidth/2;
+        let y = e.clientY - rect.top - knob.offsetHeight/2;
+        const max = (rect.width - knob.offsetWidth)/2;
+        x = Math.max(-max, Math.min(max, x));
+        y = Math.max(-max, Math.min(max, y));
+        knob.style.left = `${x + max}px`;
+        knob.style.top = `${y + max}px`;
+        sendJoystickData(axisX, x/max, axisY, -y/max);
+    });
+}
+
+function sendJoystickData(axisX, xValue, axisY, yValue) {
+    fetch(`${serverUrl}/joystick?${axisX}=${xValue}&${axisY}=${yValue}`)
+    .catch(err => console.log("Joystick Error:", err));
+}
+
+// Initialize joysticks
+setupJoystick("joystickLeft", "knobLeft", "pitch", "roll");
+setupJoystick("joystickRight", "knobRight", "throttle", "yaw");
+
+// Dashboard update function
+function updateDashboard(battery, altitude, mode, status) {
+    document.getElementById("battery").innerText = battery + "%";
+    document.getElementById("batteryFill").style.width = battery + "%";
+    document.getElementById("altitude").innerText = altitude + " m";
+    document.getElementById("altitudeFill").style.width = Math.min(100, altitude*2) + "%";
+    document.getElementById("mode").innerText = mode;
+    document.getElementById("status").innerText = status;
+}
+
+// Simulate telemetry updates (replace with real ESP32 fetch)
+setInterval(() => {
+    const battery = Math.floor(Math.random()*100);
+    const altitude = Math.floor(Math.random()*50);
+    const modes = ["STANDBY","FLIGHT","RTH"];
+    const statusList = ["OK","WARN","ERROR"];
+    updateDashboard(battery, altitude, modes[Math.floor(Math.random()*modes.length)], statusList[Math.floor(Math.random()*statusList.length)]);
+}, 1000);
+</script>
+
+</body>
+  </html>
