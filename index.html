@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CYBER HAWK v4.1</title>
+<title>CYBER HAWK v4.4</title>
 
 <style>
 body{
     margin:0;
-    background:#0a0a0a;
+    background:#000;
     color:white;
     font-family:Arial, sans-serif;
     overflow:hidden;
@@ -17,13 +17,13 @@ body{
 /* HEADER */
 .header{
     height:60px;
-    background:#111;
+    background:#0a0a0a;
     border-bottom:2px solid #ffcc00;
     display:flex;
     align-items:center;
     justify-content:space-between;
     padding:0 20px;
-    box-shadow:0 0 15px #ffcc00 inset;
+    box-shadow:0 0 20px #ffcc00 inset;
 }
 
 .header h1{
@@ -33,28 +33,11 @@ body{
     letter-spacing:2px;
 }
 
-.status{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:14px;
-}
-
-.dot{
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:lime;
-    box-shadow:0 0 8px lime;
-}
-
-/* MAIN */
 .container{
     display:flex;
     height:calc(100vh - 60px);
 }
 
-/* JOYSTICKS */
 .joystick{
     flex:1;
     display:flex;
@@ -65,11 +48,12 @@ body{
 .base{
     width:200px;
     height:200px;
-    background:#222;
+    background:#111;
     border-radius:50%;
     border:3px solid #ffcc00;
     position:relative;
     touch-action:none;
+    box-shadow:0 0 25px #ffcc00;
 }
 
 .knob{
@@ -80,31 +64,73 @@ body{
     position:absolute;
     top:50%;
     left:50%;
-    transform:translate(-50%,-50%) translate(0px,0px);
-    box-shadow:0 0 20px #ffcc00;
-    transition:transform 0.05s linear;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 30px #ffcc00;
 }
 
-/* CENTER */
 .center{
     flex:2;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:space-around;
-    background:#111;
-    padding:10px;
-    border-left:2px solid #444;
-    border-right:2px solid #444;
+}
+
+.video-container{
+    position:relative;
+    width:520px;
+    height:520px;
+    background:black;
+    border:3px solid #ffcc00;
+    border-radius:20px;
+    box-shadow:0 0 40px #ffcc00;
+    overflow:hidden;
 }
 
 video{
-    width:90%;
-    border:3px solid #ffcc00;
-    border-radius:10px;
+    position:absolute;
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-/* BUTTONS */
+#horizon{
+    position:absolute;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+/* SIGNAL */
+.signal-box{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:rgba(0,0,0,0.6);
+    border:2px solid #ffcc00;
+    padding:6px 10px;
+    border-radius:10px;
+    font-size:12px;
+    box-shadow:0 0 15px #ffcc00;
+}
+
+.signal-bars{
+    display:flex;
+    gap:3px;
+    margin-top:4px;
+}
+
+.signal-bars div{
+    width:6px;
+    background:#ffcc00;
+    opacity:0.3;
+}
+
+.bar1{height:6px;}
+.bar2{height:10px;}
+.bar3{height:14px;}
+.bar4{height:18px;}
+
 .button-row{
     display:flex;
     flex-wrap:wrap;
@@ -114,20 +140,18 @@ video{
 
 button{
     padding:10px 16px;
-    background:#222;
+    background:#111;
     color:white;
     border:2px solid #ffcc00;
     border-radius:12px;
-    font-size:14px;
     cursor:pointer;
 }
 
 button:active{
-    background:#333;
     transform:scale(0.95);
+    background:#222;
 }
 
-/* DASHBOARD */
 .dashboard{
     display:flex;
     justify-content:space-around;
@@ -135,17 +159,18 @@ button:active{
 }
 
 .panel{
-    background:#222;
+    background:#111;
     padding:6px 10px;
     border:2px solid #ffcc00;
-    border-radius:8px;
+    border-radius:10px;
     text-align:center;
     min-width:90px;
+    box-shadow:0 0 15px #ffcc00;
 }
 
 .bar{
     height:12px;
-    background:#333;
+    background:#222;
     border-radius:6px;
     margin-top:5px;
     overflow:hidden;
@@ -162,66 +187,72 @@ button:active{
 <body>
 
 <div class="header">
-    <h1>🚁 CYBER HAWK v4.1</h1>
-    <div class="status">
-        <div class="dot"></div>
-        CONNECTED
+    <h1>🚁 CYBER HAWK v4.4</h1>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <div id="statusLight" style="width:14px;height:14px;border-radius:50%;background:red;box-shadow:0 0 10px red;"></div>
+        <div id="statusText">DISCONNECTED</div>
     </div>
 </div>
 
 <div class="container">
 
-<!-- LEFT JOYSTICK -->
 <div class="joystick">
     <div class="base" id="leftBase">
         <div class="knob" id="leftKnob"></div>
     </div>
 </div>
 
-<!-- CENTER PANEL -->
 <div class="center">
 
+<div class="video-container">
     <video id="stream" autoplay muted></video>
+    <canvas id="horizon"></canvas>
 
-    <div class="button-row">
-        <button onclick="sendCommand('ARM')">ARM</button>
-        <button onclick="sendCommand('DISARM')">DISARM</button>
-        <button onclick="sendCommand('LED')">LED</button>
-        <button onclick="sendCommand('HOVER')">HOVER</button>
-        <button onclick="sendCommand('RTH')">RTH</button>
-    </div>
-
-    <div class="button-row">
-        <button onclick="sendCommand('FLIP_FRONT')">FRONT FLIP</button>
-        <button onclick="sendCommand('FLIP_BACK')">BACK FLIP</button>
-        <button onclick="capturePhoto()">📸 PHOTO</button>
-        <button onclick="toggleRecord()">⏺ RECORD</button>
-    </div>
-
-    <div class="dashboard">
-        <div class="panel">
-            Battery
-            <div class="bar"><div id="batFill" class="fill"></div></div>
-            <span id="battery">100%</span>
-        </div>
-        <div class="panel">
-            Altitude
-            <div class="bar"><div id="altFill" class="fill"></div></div>
-            <span id="altitude">0m</span>
-        </div>
-        <div class="panel">
-            Mode
-            <div id="mode">STANDBY</div>
-        </div>
-        <div class="panel">
-            Status
-            <div id="status">OK</div>
+    <div class="signal-box">
+        📡 SIGNAL
+        <div class="signal-bars">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+            <div class="bar4"></div>
         </div>
     </div>
+</div>
+
+<div class="button-row">
+    <button onclick="sendCommand('ARM')">ARM</button>
+    <button onclick="sendCommand('DISARM')">DISARM</button>
+    <button onclick="sendCommand('LED')">LED</button>
+    <button onclick="sendCommand('HOVER')">HOVER</button>
+    <button onclick="sendCommand('RTH')">RTH</button>
+</div>
+
+<div class="button-row">
+    <button onclick="sendCommand('FLIP_FRONT')">FRONT FLIP</button>
+    <button onclick="sendCommand('FLIP_BACK')">BACK FLIP</button>
+    <button onclick="capturePhoto()">📸 PHOTO</button>
+    <button id="recordBtn">🔴 RECORD</button>
+</div>
+
+<div class="dashboard">
+    <div class="panel">
+        Battery
+        <div class="bar"><div id="batFill" class="fill"></div></div>
+        <span id="battery">100%</span>
+    </div>
+    <div class="panel">
+        Altitude
+        <div class="bar"><div id="altFill" class="fill"></div></div>
+        <span id="altitude">0m</span>
+    </div>
+    <div class="panel">
+        Mode
+        <div id="mode">STANDBY</div>
+    </div>
+</div>
 
 </div>
 
-<!-- RIGHT JOYSTICK -->
 <div class="joystick">
     <div class="base" id="rightBase">
         <div class="knob" id="rightKnob"></div>
@@ -231,16 +262,35 @@ button:active{
 </div>
 
 <script>
-
 const serverUrl="http://192.168.4.1";
-
 document.getElementById("stream").src=serverUrl+"/stream";
 
+/* CONNECTION LED */
+const statusLight=document.getElementById("statusLight");
+const statusText=document.getElementById("statusText");
+
+function checkConnection(){
+    fetch(serverUrl,{mode:"no-cors"})
+    .then(()=>{
+        statusLight.style.background="lime";
+        statusLight.style.boxShadow="0 0 15px lime";
+        statusText.innerText="CONNECTED";
+    })
+    .catch(()=>{
+        statusLight.style.background="red";
+        statusLight.style.boxShadow="0 0 15px red";
+        statusText.innerText="DISCONNECTED";
+    });
+}
+setInterval(checkConnection,3000);
+checkConnection();
+
+/* COMMANDS */
 function sendCommand(cmd){
-    fetch(serverUrl+"/command?cmd="+cmd)
-    .catch(err=>console.log(err));
+    fetch(serverUrl+"/command?cmd="+cmd).catch(()=>{});
 }
 
+/* PHOTO */
 function capturePhoto(){
     fetch(serverUrl+"/capture")
     .then(res=>res.blob())
@@ -253,20 +303,29 @@ function capturePhoto(){
     });
 }
 
+/* RECORD */
 let recording=false;
-function toggleRecord(){
+const recordBtn=document.getElementById("recordBtn");
+recordBtn.addEventListener("click",()=>{
     recording=!recording;
-    if(recording){
-        sendCommand("START_RECORD");
-        alert("Recording Started");
-    }else{
-        sendCommand("STOP_RECORD");
-        alert("Recording Stopped");
-    }
-}
+    recordBtn.style.background=recording?"red":"#111";
+    recordBtn.innerText=recording?"⏺ RECORDING":"🔴 RECORD";
+});
+
+/* SIGNAL ANIMATION */
+const bars=document.querySelectorAll(".signal-bars div");
+setInterval(()=>{
+    const level=Math.floor(Math.random()*5);
+    bars.forEach((bar,index)=>{
+        bar.style.opacity=index<level?1:0.3;
+    });
+},800);
+
+/* JOYSTICKS */
+let roll=0;
+let pitch=0;
 
 function setupJoystick(baseId,knobId,axisX,axisY){
-
     const base=document.getElementById(baseId);
     const knob=document.getElementById(knobId);
     let pointerId=null;
@@ -279,47 +338,108 @@ function setupJoystick(baseId,knobId,axisX,axisY){
 
     base.addEventListener("pointermove",e=>{
         if(e.pointerId!==pointerId) return;
-
         const rect=base.getBoundingClientRect();
         let x=e.clientX-(rect.left+rect.width/2);
         let y=e.clientY-(rect.top+rect.height/2);
-
         const dist=Math.sqrt(x*x+y*y);
         if(dist>max){
             x=(x/dist)*max;
             y=(y/dist)*max;
         }
-
         knob.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
-
         fetch(serverUrl+`/joystick?${axisX}=${x/max}&${axisY}=${-y/max}`);
+        if(axisX==="pitch"){
+            pitch=(-y/max)*80;
+            roll=(x/max);
+        }
     });
 
     base.addEventListener("pointerup",e=>{
         if(e.pointerId!==pointerId) return;
         pointerId=null;
-
-        knob.style.transform="translate(-50%,-50%) translate(0px,0px)";
+        knob.style.transform="translate(-50%,-50%)";
         fetch(serverUrl+`/joystick?${axisX}=0&${axisY}=0`);
+        pitch=0;
+        roll=0;
     });
 }
 
 setupJoystick("leftBase","leftKnob","pitch","roll");
 setupJoystick("rightBase","rightKnob","throttle","yaw");
 
-/* Demo telemetry */
-setInterval(()=>{
-    const b=Math.floor(Math.random()*100);
-    const a=Math.floor(Math.random()*50);
+/* ARTIFICIAL HORIZON v4.4 */
+const canvas=document.getElementById("horizon");
+const ctx=canvas.getContext("2d");
 
-    document.getElementById("battery").innerText=b+"%";
-    document.getElementById("batFill").style.width=b+"%";
+function resizeCanvas(){
+    canvas.width=canvas.offsetWidth;
+    canvas.height=canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
 
-    document.getElementById("altitude").innerText=a+"m";
-    document.getElementById("altFill").style.width=(a*2)+"%";
-},1000);
+function drawHorizon(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const cx=canvas.width/2;
+    const cy=canvas.height/2;
+
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(roll);
+
+    ctx.fillStyle="#000";
+    ctx.fillRect(-canvas.width*2,-canvas.height*2,canvas.width*4,canvas.height*4);
+
+    ctx.strokeStyle="#ffcc00";
+    ctx.lineWidth=3;
+    ctx.shadowBlur=25;
+    ctx.shadowColor="#ffcc00";
+
+    ctx.beginPath();
+    ctx.moveTo(-canvas.width,pitch);
+    ctx.lineTo(canvas.width,pitch);
+    ctx.stroke();
+
+    ctx.lineWidth=2;
+    ctx.font="bold 14px Arial";
+    ctx.fillStyle="#ffcc00";
+
+    for(let i=-50;i<=50;i+=10){
+        let y=pitch+i*4;
+        ctx.beginPath();
+        ctx.moveTo(-60,y);
+        ctx.lineTo(60,y);
+        ctx.stroke();
+        if(i!==0){
+            ctx.fillText(i,70,y+4);
+            ctx.fillText(i,-90,y+4);
+        }
+    }
+
+    ctx.restore();
+
+    ctx.strokeStyle="#ffcc00";
+    ctx.lineWidth=4;
+    ctx.shadowBlur=30;
+
+    ctx.beginPath();
+    ctx.moveTo(cx-40,cy);
+    ctx.lineTo(cx-10,cy);
+    ctx.moveTo(cx+10,cy);
+    ctx.lineTo(cx+40,cy);
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx,cy+15);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx,cy,canvas.width/2-25,Math.PI*1.1,Math.PI*1.9);
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    requestAnimationFrame(drawHorizon);
+}
+drawHorizon();
 
 </script>
-
 </body>
-    </html>
+            </html>
