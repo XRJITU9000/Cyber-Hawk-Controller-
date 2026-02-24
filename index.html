@@ -3,258 +3,323 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CYBER HAWK Game Controller</title>
+<title>CYBER HAWK v4.1</title>
+
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #0a0a0a;
-        color: #fff;
-        font-family: 'Arial', sans-serif;
-        overflow: hidden;
-    }
+body{
+    margin:0;
+    background:#0a0a0a;
+    color:white;
+    font-family:Arial, sans-serif;
+    overflow:hidden;
+}
 
-    .container {
-        display: flex;
-        flex-direction: row;
-        height: 100vh;
-        width: 100vw;
-    }
+/* HEADER */
+.header{
+    height:60px;
+    background:#111;
+    border-bottom:2px solid #ffcc00;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    box-shadow:0 0 15px #ffcc00 inset;
+}
 
-    /* Joysticks */
-    .joystick-left, .joystick-right {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.header h1{
+    margin:0;
+    font-size:22px;
+    color:#ffcc00;
+    letter-spacing:2px;
+}
 
-    .joystick-base {
-        width: 160px;
-        height: 160px;
-        background: #222;
-        border-radius: 50%;
-        border: 3px solid #fff;
-        position: relative;
-        box-shadow: 0 0 20px #000 inset;
-    }
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+}
 
-    .joystick-knob {
-        width: 60px;
-        height: 60px;
-        background: #ffcc00;
-        border-radius: 50%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        transition: left 0.05s, top 0.05s;
-        box-shadow: 0 0 15px #ffcc00;
-        touch-action: none;
-    }
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:lime;
+    box-shadow:0 0 8px lime;
+}
 
-    /* Central Screen + Dashboard */
-    .central-screen {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-around;
-        background: #111;
-        border-left: 2px solid #555;
-        border-right: 2px solid #555;
-        padding: 10px;
-    }
+/* MAIN */
+.container{
+    display:flex;
+    height:calc(100vh - 60px);
+}
 
-    .central-screen video {
-        width: 85%;
-        height: auto;
-        border: 3px solid #ffcc00;
-        border-radius: 8px;
-        box-shadow: 0 0 20px #ffcc00;
-    }
+/* JOYSTICKS */
+.joystick{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-    .button-row {
-        display: flex;
-        justify-content: space-around;
-        width: 90%;
-        margin-top: 15px;
-    }
+.base{
+    width:200px;
+    height:200px;
+    background:#222;
+    border-radius:50%;
+    border:3px solid #ffcc00;
+    position:relative;
+    touch-action:none;
+}
 
-    button {
-        padding: 12px 18px;
-        background: #222;
-        color: #fff;
-        border: 2px solid #ffcc00;
-        border-radius: 12px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 10px #000 inset;
-    }
+.knob{
+    width:80px;
+    height:80px;
+    background:#ffcc00;
+    border-radius:50%;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) translate(0px,0px);
+    box-shadow:0 0 20px #ffcc00;
+    transition:transform 0.05s linear;
+}
 
-    button:active {
-        box-shadow: 0 0 20px #ffcc00;
-        background: #333;
-        transform: scale(0.95);
-    }
+/* CENTER */
+.center{
+    flex:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-around;
+    background:#111;
+    padding:10px;
+    border-left:2px solid #444;
+    border-right:2px solid #444;
+}
 
-    .dashboard {
-        display: flex;
-        justify-content: space-around;
-        width: 90%;
-        margin-top: 15px;
-    }
+video{
+    width:90%;
+    border:3px solid #ffcc00;
+    border-radius:10px;
+}
 
-    .dashboard div {
-        padding: 5px 12px;
-        background: #222;
-        border: 2px solid #ffcc00;
-        border-radius: 10px;
-        text-align: center;
-        min-width: 100px;
-        box-shadow: 0 0 15px #ffcc00 inset;
-    }
+/* BUTTONS */
+.button-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+}
 
-    .telemetry-bar {
-        height: 15px;
-        background: #333;
-        border-radius: 8px;
-        margin-top: 5px;
-        position: relative;
-        overflow: hidden;
-    }
+button{
+    padding:10px 16px;
+    background:#222;
+    color:white;
+    border:2px solid #ffcc00;
+    border-radius:12px;
+    font-size:14px;
+    cursor:pointer;
+}
 
-    .telemetry-fill {
-        height: 100%;
-        background: #ffcc00;
-        width: 0%;
-        border-radius: 8px;
-        transition: width 0.5s ease;
-    }
+button:active{
+    background:#333;
+    transform:scale(0.95);
+}
+
+/* DASHBOARD */
+.dashboard{
+    display:flex;
+    justify-content:space-around;
+    width:95%;
+}
+
+.panel{
+    background:#222;
+    padding:6px 10px;
+    border:2px solid #ffcc00;
+    border-radius:8px;
+    text-align:center;
+    min-width:90px;
+}
+
+.bar{
+    height:12px;
+    background:#333;
+    border-radius:6px;
+    margin-top:5px;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    background:#ffcc00;
+    width:0%;
+}
 </style>
 </head>
+
 <body>
 
-<div class="container">
-    <!-- Left Joystick -->
-    <div class="joystick-left">
-        <div class="joystick-base" id="joystickLeft">
-            <div class="joystick-knob" id="knobLeft"></div>
-        </div>
-    </div>
-
-    <!-- Central Screen + Dashboard -->
-    <div class="central-screen">
-        <video id="liveStream" autoplay muted></video>
-
-        <!-- Buttons -->
-        <div class="button-row">
-            <button id="armBtn" onclick="sendCommand('ARM')">ARM</button>
-            <button id="disarmBtn" onclick="sendCommand('DISARM')">DISARM</button>
-            <button id="ledBtn" onclick="sendCommand('LED')">LED</button>
-            <button id="flipBtn" onclick="sendCommand('FLIP')">FLIP</button>
-            <button id="rthBtn" onclick="sendCommand('RTH')">RTH</button>
-        </div>
-
-        <!-- Dashboard -->
-        <div class="dashboard">
-            <div>
-                Battery
-                <div class="telemetry-bar"><div id="batteryFill" class="telemetry-fill"></div></div>
-                <span id="battery">100%</span>
-            </div>
-            <div>
-                Altitude
-                <div class="telemetry-bar"><div id="altitudeFill" class="telemetry-fill"></div></div>
-                <span id="altitude">0 m</span>
-            </div>
-            <div>
-                Mode
-                <span id="mode">STANDBY</span>
-            </div>
-            <div>
-                Status
-                <span id="status">OK</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Joystick -->
-    <div class="joystick-right">
-        <div class="joystick-base" id="joystickRight">
-            <div class="joystick-knob" id="knobRight"></div>
-        </div>
+<div class="header">
+    <h1>🚁 CYBER HAWK v4.1</h1>
+    <div class="status">
+        <div class="dot"></div>
+        CONNECTED
     </div>
 </div>
 
+<div class="container">
+
+<!-- LEFT JOYSTICK -->
+<div class="joystick">
+    <div class="base" id="leftBase">
+        <div class="knob" id="leftKnob"></div>
+    </div>
+</div>
+
+<!-- CENTER PANEL -->
+<div class="center">
+
+    <video id="stream" autoplay muted></video>
+
+    <div class="button-row">
+        <button onclick="sendCommand('ARM')">ARM</button>
+        <button onclick="sendCommand('DISARM')">DISARM</button>
+        <button onclick="sendCommand('LED')">LED</button>
+        <button onclick="sendCommand('HOVER')">HOVER</button>
+        <button onclick="sendCommand('RTH')">RTH</button>
+    </div>
+
+    <div class="button-row">
+        <button onclick="sendCommand('FLIP_FRONT')">FRONT FLIP</button>
+        <button onclick="sendCommand('FLIP_BACK')">BACK FLIP</button>
+        <button onclick="capturePhoto()">📸 PHOTO</button>
+        <button onclick="toggleRecord()">⏺ RECORD</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="panel">
+            Battery
+            <div class="bar"><div id="batFill" class="fill"></div></div>
+            <span id="battery">100%</span>
+        </div>
+        <div class="panel">
+            Altitude
+            <div class="bar"><div id="altFill" class="fill"></div></div>
+            <span id="altitude">0m</span>
+        </div>
+        <div class="panel">
+            Mode
+            <div id="mode">STANDBY</div>
+        </div>
+        <div class="panel">
+            Status
+            <div id="status">OK</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- RIGHT JOYSTICK -->
+<div class="joystick">
+    <div class="base" id="rightBase">
+        <div class="knob" id="rightKnob"></div>
+    </div>
+</div>
+
+</div>
+
 <script>
-const serverUrl = "http://192.168.4.1"; // Replace with your ESP32 IP
 
-// Send command
-function sendCommand(cmd) {
-    fetch(`${serverUrl}/command?cmd=${cmd}`)
-    .catch(err => console.log("Error:", err));
+const serverUrl="http://192.168.4.1";
+
+document.getElementById("stream").src=serverUrl+"/stream";
+
+function sendCommand(cmd){
+    fetch(serverUrl+"/command?cmd="+cmd)
+    .catch(err=>console.log(err));
 }
 
-// Live stream
-const liveStream = document.getElementById("liveStream");
-liveStream.src = `${serverUrl}/stream`;
-
-// Joystick logic
-function setupJoystick(baseId, knobId, axisX, axisY) {
-    const base = document.getElementById(baseId);
-    const knob = document.getElementById(knobId);
-    let dragging = false;
-
-    knob.addEventListener('pointerdown', e => { dragging = true; });
-    document.addEventListener('pointerup', e => {
-        dragging = false;
-        knob.style.left = "50%";
-        knob.style.top = "50%";
-        sendJoystickData(axisX, 0, axisY, 0);
-    });
-
-    document.addEventListener('pointermove', e => {
-        if(!dragging) return;
-        const rect = base.getBoundingClientRect();
-        let x = e.clientX - rect.left - knob.offsetWidth/2;
-        let y = e.clientY - rect.top - knob.offsetHeight/2;
-        const max = (rect.width - knob.offsetWidth)/2;
-        x = Math.max(-max, Math.min(max, x));
-        y = Math.max(-max, Math.min(max, y));
-        knob.style.left = `${x + max}px`;
-        knob.style.top = `${y + max}px`;
-        sendJoystickData(axisX, x/max, axisY, -y/max);
+function capturePhoto(){
+    fetch(serverUrl+"/capture")
+    .then(res=>res.blob())
+    .then(blob=>{
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url;
+        a.download="cyberhawk.jpg";
+        a.click();
     });
 }
 
-function sendJoystickData(axisX, xValue, axisY, yValue) {
-    fetch(`${serverUrl}/joystick?${axisX}=${xValue}&${axisY}=${yValue}`)
-    .catch(err => console.log("Joystick Error:", err));
+let recording=false;
+function toggleRecord(){
+    recording=!recording;
+    if(recording){
+        sendCommand("START_RECORD");
+        alert("Recording Started");
+    }else{
+        sendCommand("STOP_RECORD");
+        alert("Recording Stopped");
+    }
 }
 
-setupJoystick("joystickLeft", "knobLeft", "pitch", "roll");
-setupJoystick("joystickRight", "knobRight", "throttle", "yaw");
+function setupJoystick(baseId,knobId,axisX,axisY){
 
-// Dashboard update
-function updateDashboard(battery, altitude, mode, status) {
-    document.getElementById("battery").innerText = battery + "%";
-    document.getElementById("batteryFill").style.width = battery + "%";
-    document.getElementById("altitude").innerText = altitude + " m";
-    document.getElementById("altitudeFill").style.width = Math.min(100, altitude*2) + "%"; // normalize
-    document.getElementById("mode").innerText = mode;
-    document.getElementById("status").innerText = status;
+    const base=document.getElementById(baseId);
+    const knob=document.getElementById(knobId);
+    let pointerId=null;
+    const max=70;
+
+    base.addEventListener("pointerdown",e=>{
+        pointerId=e.pointerId;
+        base.setPointerCapture(pointerId);
+    });
+
+    base.addEventListener("pointermove",e=>{
+        if(e.pointerId!==pointerId) return;
+
+        const rect=base.getBoundingClientRect();
+        let x=e.clientX-(rect.left+rect.width/2);
+        let y=e.clientY-(rect.top+rect.height/2);
+
+        const dist=Math.sqrt(x*x+y*y);
+        if(dist>max){
+            x=(x/dist)*max;
+            y=(y/dist)*max;
+        }
+
+        knob.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
+
+        fetch(serverUrl+`/joystick?${axisX}=${x/max}&${axisY}=${-y/max}`);
+    });
+
+    base.addEventListener("pointerup",e=>{
+        if(e.pointerId!==pointerId) return;
+        pointerId=null;
+
+        knob.style.transform="translate(-50%,-50%) translate(0px,0px)";
+        fetch(serverUrl+`/joystick?${axisX}=0&${axisY}=0`);
+    });
 }
 
-// Example: simulate telemetry updates (replace with real ESP32 fetch)
-setInterval(() => {
-    const battery = Math.floor(Math.random()*100);
-    const altitude = Math.floor(Math.random()*50);
-    const modes = ["STANDBY","FLIGHT","RTH"];
-    const statusList = ["OK","WARN","ERROR"];
-    updateDashboard(battery, altitude, modes[Math.floor(Math.random()*modes.length)], statusList[Math.floor(Math.random()*statusList.length)]);
-}, 1000);
+setupJoystick("leftBase","leftKnob","pitch","roll");
+setupJoystick("rightBase","rightKnob","throttle","yaw");
+
+/* Demo telemetry */
+setInterval(()=>{
+    const b=Math.floor(Math.random()*100);
+    const a=Math.floor(Math.random()*50);
+
+    document.getElementById("battery").innerText=b+"%";
+    document.getElementById("batFill").style.width=b+"%";
+
+    document.getElementById("altitude").innerText=a+"m";
+    document.getElementById("altFill").style.width=(a*2)+"%";
+},1000);
+
 </script>
+
 </body>
-            </html>
+    </html>
