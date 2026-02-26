@@ -14,7 +14,6 @@ body{
     overflow:hidden;
 }
 
-/* HEADER */
 .header{
     height:60px;
     background:#0a0a0a;
@@ -100,11 +99,12 @@ video{
     height:100%;
     pointer-events:none;
 }
-    /* SIGNAL */
+
+/* SIGNAL — EXTREME RIGHT */
 .signal-box{
     position:absolute;
     top:10px;
-    left:10px;
+    right:10px;
     background:rgba(0,0,0,0.6);
     border:2px solid #ffcc00;
     padding:6px 10px;
@@ -112,6 +112,7 @@ video{
     font-size:12px;
     box-shadow:0 0 15px #ffcc00;
 }
+
 .signal-bars{
     display:flex;
     gap:3px;
@@ -263,7 +264,6 @@ button:active{
 const serverUrl="http://192.168.4.1";
 document.getElementById("stream").src=serverUrl+"/stream";
 
-/* CONNECTION LED */
 const statusLight=document.getElementById("statusLight");
 const statusText=document.getElementById("statusText");
 
@@ -283,39 +283,59 @@ function checkConnection(){
 setInterval(checkConnection,3000);
 checkConnection();
 
-/* COMMANDS */
+let hoverMode=false;
+let batteryLevel=100;
+let throttleValue=0;
+let altitude=0;
+
 function sendCommand(cmd){
+    if(cmd==="HOVER"){
+        hoverMode=!hoverMode;
+        document.getElementById("mode").innerText=hoverMode?"HOVER":"STANDBY";
+    }
+
+    if(cmd==="RTH"){
+        document.getElementById("mode").innerText="RETURNING";
+        let interval=setInterval(()=>{
+            altitude-=1;
+            if(altitude<=0){
+                altitude=0;
+                document.getElementById("mode").innerText="LANDED";
+                clearInterval(interval);
+            }
+        },100);
+    }
+
     fetch(serverUrl+"/command?cmd="+cmd).catch(()=>{});
 }
 
-/* PHOTO */
-function capturePhoto(){
-    fetch(serverUrl+"/capture")
-    .then(res=>res.blob())
-    .then(blob=>{
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url;
-        a.download="cyberhawk.jpg";
-        a.click();
-    });
-}
+/* BATTERY */
+setInterval(()=>{
+    if(batteryLevel>0) batteryLevel-=0.05;
+    document.getElementById("battery").innerText=Math.floor(batteryLevel)+"%";
+    document.getElementById("batFill").style.width=batteryLevel+"%";
+    if(batteryLevel<20){
+        document.getElementById("batFill").style.background="red";
+    }
+},1000);
 
-/* RECORD */
-let recording=false;
-const recordBtn=document.getElementById("recordBtn");
-recordBtn.addEventListener("click",()=>{
-    recording=!recording;
-    recordBtn.style.background=recording?"red":"#111";
-    recordBtn.innerText=recording?"⏺ RECORDING":"🔴 RECORD";
-});
+/* ALTITUDE */
+setInterval(()=>{
+    altitude+=throttleValue*0.5;
+    if(altitude<0) altitude=0;
+    if(altitude>100) altitude=100;
+    document.getElementById("altitude").innerText=altitude.toFixed(1)+"m";
+    document.getElementById("altFill").style.width=altitude+"%";
+},200);
 
-/* SIGNAL ANIMATION */
+/* SIGNAL */
 const bars=document.querySelectorAll(".signal-bars div");
 setInterval(()=>{
-    const level=Math.floor(Math.random()*5);
+    const strength=statusText.innerText==="CONNECTED"
+        ?Math.floor(Math.random()*4)+1
+        :0;
     bars.forEach((bar,index)=>{
-        bar.style.opacity=index<level?1:0.3;
+        bar.style.opacity=index<strength?1:0.3;
     });
 },800);
 
@@ -345,11 +365,17 @@ function setupJoystick(baseId,knobId,axisX,axisY){
             y=(y/dist)*max;
         }
         knob.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
-        fetch(serverUrl+`/joystick?${axisX}=${x/max}&${axisY}=${-y/max}`);
+
         if(axisX==="pitch"){
-            pitch=(-y/max)*80;
-            roll=(x/max);
+            pitch=hoverMode?0:(-y/max)*80;
+            roll=hoverMode?0:(x/max);
         }
+
+        if(axisX==="throttle"){
+            throttleValue=-y/max;
+        }
+
+        fetch(serverUrl+`/joystick?${axisX}=${x/max}&${axisY}=${-y/max}`);
     });
 
     base.addEventListener("pointerup",e=>{
@@ -378,6 +404,7 @@ window.addEventListener("resize",resizeCanvas);
 
 function drawHorizon(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
     const cx=canvas.width/2;
     const cy=canvas.height/2;
 
@@ -437,7 +464,7 @@ function drawHorizon(){
     requestAnimationFrame(drawHorizon);
 }
 drawHorizon();
-
 </script>
+
 </body>
-            </html>
+        </html>
