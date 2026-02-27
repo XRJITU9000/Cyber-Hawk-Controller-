@@ -261,11 +261,15 @@ button.recording{
 <canvas id="photoCanvas" style="display:none;"></canvas>
 
 <script>
-const serverUrl = "http://192.168.4.1";
-const videoEl   = document.getElementById("stream");
+// ── SERVER URLs ──────────────────────────────────────────
+// ESP32-CAM hosts both stream (port 81) and commands (port 80)
+const serverUrl   = "http://192.168.4.1";
+const streamUrl   = "http://192.168.4.1:81/stream";
+const videoEl     = document.getElementById("stream");
 
 /* ── STREAM ─────────────────────────────────────────── */
-videoEl.src = serverUrl + "/stream?width=480&height=240&fps=15";
+// ESP32-CAM MJPEG stream on port 81
+videoEl.src = streamUrl;
 
 /* ── CONNECTION CHECK ────────────────────────────────── */
 const statusLight = document.getElementById("statusLight");
@@ -687,15 +691,12 @@ setInterval(()=>{
         return;
     }
 
-    // Distance simulation
     signalDistance += (throttleVal * 0.3) + (pitchNorm * 0.2);
     signalDistance  = Math.max(0, Math.min(100, signalDistance));
 
-    // Multipath fading
     signalFadePhase += 0.08;
     const fadeFactor = Math.sin(signalFadePhase) * 4;
 
-    // Interference burst
     if(signalBurst > 0){
         signalBurst--;
     } else if(Math.random() < 0.04){
@@ -703,7 +704,6 @@ setInterval(()=>{
     }
     const burstDrop = signalBurst > 0 ? Math.random() * 18 : 0;
 
-    // Base signal with inverse square degradation
     const baseSignal = 100 - (signalDistance * 0.55);
     const noise      = (Math.random() * 4) - 2;
 
@@ -714,14 +714,12 @@ setInterval(()=>{
     const el  = document.getElementById("signalText");
     el.innerText = pct + "%";
 
-    // Color based on signal loss
     const loss = 100 - pct;
     if(loss >= 15)      el.style.color = "#ffcc00";
     else if(loss >= 10) el.style.color = "#ff8800";
     else if(loss >= 5)  el.style.color = "#ff3333";
     else                el.style.color = "#ffcc00";
 
-    // Range warnings
     const rangePct = 100 - pct;
 
     if(rangePct >= 90 && rangePct < 95 && !signalWarning90Triggered){
