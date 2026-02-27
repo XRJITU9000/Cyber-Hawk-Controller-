@@ -6,35 +6,43 @@
 <title>CYBER HAWK Genesis Edition</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
     background:#000;
     color:white;
     font-family:Arial, sans-serif;
     overflow:hidden;
+    width:100vw;
+    height:100vh;
 }
 
 .header{
-    height:60px;
+    height:50px;
     background:#0a0a0a;
     border-bottom:2px solid #ffcc00;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 20px;
+    padding:0 12px;
     box-shadow:0 0 20px #ffcc00 inset;
 }
 
 .header h1{
     margin:0;
-    font-size:22px;
+    font-size:16px;
     color:#ffcc00;
-    letter-spacing:2px;
+    letter-spacing:1px;
 }
 
 .container{
     display:flex;
-    height:calc(100vh - 60px);
+    height:calc(100vh - 50px);
+    width:100vw;
+    align-items:center;
 }
 
 .joystick{
@@ -42,11 +50,12 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    height:100%;
 }
 
 .base{
-    width:200px;
-    height:200px;
+    width:clamp(120px, 18vw, 200px);
+    height:clamp(120px, 18vw, 200px);
     background:#111;
     border-radius:50%;
     border:3px solid #ffcc00;
@@ -56,8 +65,8 @@ body{
 }
 
 .knob{
-    width:80px;
-    height:80px;
+    width:38%;
+    height:38%;
     background:#ffcc00;
     border-radius:50%;
     position:absolute;
@@ -68,20 +77,23 @@ body{
 }
 
 .center{
-    flex:2;
+    flex:2.5;
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:space-around;
+    justify-content:space-evenly;
+    height:100%;
+    padding:6px 0;
+    gap:6px;
 }
 
 .video-container{
     position:relative;
-    width:520px;
-    height:520px;
+    width:100%;
+    aspect-ratio:2/1;
     background:black;
     border:3px solid #ffcc00;
-    border-radius:20px;
+    border-radius:14px;
     box-shadow:0 0 40px #ffcc00;
     overflow:hidden;
 }
@@ -100,50 +112,26 @@ video{
     pointer-events:none;
 }
 
-/* SIGNAL — EXTREME RIGHT */
-.signal-box{
-    position:absolute;
-    top:10px;
-    right:10px;
-    background:rgba(0,0,0,0.6);
-    border:2px solid #ffcc00;
-    padding:6px 10px;
-    border-radius:10px;
-    font-size:12px;
-    box-shadow:0 0 15px #ffcc00;
-}
-
-.signal-bars{
-    display:flex;
-    gap:3px;
-    margin-top:4px;
-}
-
-.signal-bars div{
-    width:6px;
-    background:#ffcc00;
-    opacity:0.3;
-}
-
-.bar1{height:6px;}
-.bar2{height:10px;}
-.bar3{height:14px;}
-.bar4{height:18px;}
-
 .button-row{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:10px;
+    gap:6px;
+    width:100%;
 }
 
 button{
-    padding:10px 16px;
+    padding:8px 10px;
     background:#111;
     color:white;
     border:2px solid #ffcc00;
-    border-radius:12px;
+    border-radius:10px;
     cursor:pointer;
+    font-family:Arial, sans-serif;
+    font-size:clamp(10px, 1.4vw, 14px);
+    flex:1;
+    min-width:60px;
+    max-width:110px;
 }
 
 button:active{
@@ -151,27 +139,40 @@ button:active{
     background:#222;
 }
 
+button.recording{
+    border-color:#ff3333;
+    color:#ff3333;
+    animation:recpulse 1s ease-in-out infinite;
+}
+
+@keyframes recpulse{
+    0%,100%{ box-shadow:0 0 6px #ff3333; }
+    50%{ box-shadow:0 0 22px #ff3333; }
+}
+
 .dashboard{
     display:flex;
     justify-content:space-around;
-    width:95%;
+    width:100%;
+    gap:6px;
 }
 
 .panel{
     background:#111;
-    padding:6px 10px;
+    padding:5px 8px;
     border:2px solid #ffcc00;
     border-radius:10px;
     text-align:center;
-    min-width:90px;
+    flex:1;
     box-shadow:0 0 15px #ffcc00;
+    font-size:clamp(10px, 1.3vw, 14px);
 }
 
 .bar{
-    height:12px;
+    height:10px;
     background:#222;
     border-radius:6px;
-    margin-top:5px;
+    margin-top:4px;
     overflow:hidden;
 }
 
@@ -179,6 +180,7 @@ button:active{
     height:100%;
     background:#ffcc00;
     width:0%;
+    transition:width 0.3s ease;
 }
 </style>
 </head>
@@ -187,9 +189,14 @@ button:active{
 
 <div class="header">
     <h1>🚁 CYBER HAWK Genesis Edition</h1>
-    <div style="display:flex;align-items:center;gap:8px;">
-        <div id="statusLight" style="width:14px;height:14px;border-radius:50%;background:red;box-shadow:0 0 10px red;"></div>
-        <div id="statusText">DISCONNECTED</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div id="statusLight" style="width:14px;height:14px;border-radius:50%;background:red;box-shadow:0 0 10px red;"></div>
+            <div id="statusText">DISCONNECTED</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;border:2px solid #ffcc00;padding:4px 10px;border-radius:10px;box-shadow:0 0 10px #ffcc00;font-size:13px;">
+            📡 <span id="signalText">0%</span>
+        </div>
     </div>
 </div>
 
@@ -204,18 +211,8 @@ button:active{
 <div class="center">
 
 <div class="video-container">
-    <video id="stream" autoplay muted></video>
+    <video id="stream" autoplay muted playsinline></video>
     <canvas id="horizon"></canvas>
-
-    <div class="signal-box">
-        📡 SIGNAL
-        <div class="signal-bars">
-            <div class="bar1"></div>
-            <div class="bar2"></div>
-            <div class="bar3"></div>
-            <div class="bar4"></div>
-        </div>
-    </div>
 </div>
 
 <div class="button-row">
@@ -224,13 +221,14 @@ button:active{
     <button onclick="sendCommand('LED')">LED</button>
     <button onclick="sendCommand('HOVER')">HOVER</button>
     <button onclick="sendCommand('RTH')">RTH</button>
+    <button id="headBtn" onclick="toggleHeadless()">HEADED</button>
 </div>
 
 <div class="button-row">
-    <button onclick="sendCommand('FLIP_FRONT')">FRONT FLIP</button>
-    <button onclick="sendCommand('FLIP_BACK')">BACK FLIP</button>
+    <button onclick="doFlip('FLIP_FRONT')">FRONT FLIP</button>
+    <button onclick="doFlip('FLIP_BACK')">BACK FLIP</button>
     <button onclick="capturePhoto()">📸 PHOTO</button>
-    <button id="recordBtn">🔴 RECORD</button>
+    <button id="recordBtn" onclick="toggleRecord()">🔴 RECORD</button>
 </div>
 
 <div class="dashboard">
@@ -260,211 +258,554 @@ button:active{
 
 </div>
 
-<script>
-const serverUrl="http://192.168.4.1";
-document.getElementById("stream").src=serverUrl+"/stream";
+<canvas id="photoCanvas" style="display:none;"></canvas>
 
-const statusLight=document.getElementById("statusLight");
-const statusText=document.getElementById("statusText");
+<script>
+const serverUrl = "http://192.168.4.1";
+const videoEl   = document.getElementById("stream");
+
+/* ── STREAM ─────────────────────────────────────────── */
+videoEl.src = serverUrl + "/stream?width=480&height=240&fps=15";
+
+/* ── CONNECTION CHECK ────────────────────────────────── */
+const statusLight = document.getElementById("statusLight");
+const statusText  = document.getElementById("statusText");
+let isConnected   = false;
 
 function checkConnection(){
-    fetch(serverUrl,{mode:"no-cors"})
-    .then(()=>{
-        statusLight.style.background="lime";
-        statusLight.style.boxShadow="0 0 15px lime";
-        statusText.innerText="CONNECTED";
-    })
-    .catch(()=>{
-        statusLight.style.background="red";
-        statusLight.style.boxShadow="0 0 15px red";
-        statusText.innerText="DISCONNECTED";
-    });
+    const ctrl = new AbortController();
+    const tid  = setTimeout(()=>ctrl.abort(), 2000);
+
+    fetch(serverUrl + "/status", { method:"HEAD", signal:ctrl.signal })
+        .then(()=>{
+            clearTimeout(tid);
+            setConnected(true);
+        })
+        .catch(()=>{
+            clearTimeout(tid);
+            setConnected(false);
+        });
 }
-setInterval(checkConnection,3000);
+
+function setConnected(val){
+    isConnected = val;
+    if(val){
+        statusLight.style.background = "lime";
+        statusLight.style.boxShadow  = "0 0 15px lime";
+        statusText.innerText         = "CONNECTED";
+    } else {
+        statusLight.style.background = "red";
+        statusLight.style.boxShadow  = "0 0 15px red";
+        statusText.innerText         = "DISCONNECTED";
+    }
+}
+
+setInterval(checkConnection, 3000);
 checkConnection();
 
-let hoverMode=false;
-let batteryLevel=100;
-let throttleValue=0;
-let altitude=0;
+/* ── STATE ───────────────────────────────────────────── */
+let hoverMode    = false;
+let batteryLevel = 100;
+let throttleVal  = 0;
+let altitude     = 0;
+let rthActive    = false;
+let rthInterval  = null;
 
+/* ── COMMANDS ────────────────────────────────────────── */
 function sendCommand(cmd){
-    if(cmd==="HOVER"){
-        hoverMode=!hoverMode;
-        document.getElementById("mode").innerText=hoverMode?"HOVER":"STANDBY";
+    if(cmd === "HOVER"){
+        hoverMode = !hoverMode;
+        document.getElementById("mode").innerText = hoverMode ? "HOVER" : "STANDBY";
     }
 
-    if(cmd==="RTH"){
-        document.getElementById("mode").innerText="RETURNING";
-        let interval=setInterval(()=>{
-            altitude-=1;
-            if(altitude<=0){
-                altitude=0;
-                document.getElementById("mode").innerText="LANDED";
-                clearInterval(interval);
+    if(cmd === "RTH" && !rthActive){
+        rthActive = true;
+        document.getElementById("mode").innerText = "RETURNING";
+        rthInterval = setInterval(()=>{
+            altitude -= 1;
+            if(altitude <= 0){
+                altitude = 0;
+                document.getElementById("mode").innerText = "LANDED";
+                rthActive = false;
+                clearInterval(rthInterval);
             }
-        },100);
+        }, 100);
     }
 
-    fetch(serverUrl+"/command?cmd="+cmd).catch(()=>{});
+    fetch(serverUrl + "/command?cmd=" + cmd).catch(()=>{});
 }
 
-/* BATTERY */
+/* ── BATTERY ─────────────────────────────────────────── */
 setInterval(()=>{
-    if(batteryLevel>0) batteryLevel-=0.05;
-    document.getElementById("battery").innerText=Math.floor(batteryLevel)+"%";
-    document.getElementById("batFill").style.width=batteryLevel+"%";
-    if(batteryLevel<20){
-        document.getElementById("batFill").style.background="red";
+    if(batteryLevel > 0) batteryLevel -= 0.05;
+    const pct = Math.max(0, batteryLevel);
+    document.getElementById("battery").innerText   = Math.floor(pct) + "%";
+    document.getElementById("batFill").style.width = pct + "%";
+
+    const fill = document.getElementById("batFill");
+    if(pct < 20)       fill.style.background = "red";
+    else if(pct < 40)  fill.style.background = "#ff8800";
+    else               fill.style.background = "#ffcc00";
+
+    if(pct <= 5 && !rthActive) sendCommand("RTH");
+}, 1000);
+
+/* ── ALTITUDE ────────────────────────────────────────── */
+setInterval(()=>{
+    if(rthActive) return;
+    altitude += throttleVal * 0.5;
+    if(altitude < 0)   altitude = 0;
+    if(altitude > 100) altitude = 100;
+    document.getElementById("altitude").innerText  = altitude.toFixed(1) + "m";
+    document.getElementById("altFill").style.width = altitude + "%";
+}, 200);
+
+/* ── JOYSTICKS ───────────────────────────────────────── */
+let rollNorm  = 0;
+let pitchNorm = 0;
+let yawNorm   = 0;
+
+function setupJoystick(baseId, knobId, side){
+    const base = document.getElementById(baseId);
+    const knob = document.getElementById(knobId);
+    let pointerId = null;
+    const MAX = base.offsetWidth * 0.35;
+
+    base.addEventListener("pointerdown", e=>{
+        e.preventDefault();
+        pointerId = e.pointerId;
+        base.setPointerCapture(e.pointerId);
+        moveKnob(e);
+    });
+
+    base.addEventListener("pointermove", e=>{
+        e.preventDefault();
+        if(e.pointerId !== pointerId) return;
+        moveKnob(e);
+    });
+
+    base.addEventListener("pointerup", e=>{
+        if(e.pointerId !== pointerId) return;
+        pointerId = null;
+        knob.style.transform = "translate(-50%,-50%)";
+        if(side === "left"){
+            rollNorm = 0; pitchNorm = 0;
+            fetch(serverUrl + "/joystick?roll=0&pitch=0").catch(()=>{});
+        } else {
+            if(!hoverMode){ throttleVal = 0; yawNorm = 0; }
+            fetch(serverUrl + "/joystick?yaw=0&throttle=0").catch(()=>{});
+        }
+    });
+
+    base.addEventListener("pointercancel", e=>{
+        if(e.pointerId !== pointerId) return;
+        pointerId = null;
+        knob.style.transform = "translate(-50%,-50%)";
+    });
+
+    function moveKnob(e){
+        const rect = base.getBoundingClientRect();
+        let x = e.clientX - (rect.left + rect.width  / 2);
+        let y = e.clientY - (rect.top  + rect.height / 2);
+        const dist = Math.sqrt(x*x + y*y);
+        if(dist > MAX){ x=(x/dist)*MAX; y=(y/dist)*MAX; }
+
+        knob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+
+        const nx =  x / MAX;
+        const ny = -y / MAX;
+
+        if(side === "left"){
+            rollNorm  = hoverMode ? 0 : nx;
+            pitchNorm = hoverMode ? 0 : ny;
+            fetch(serverUrl + `/joystick?roll=${hoverMode ? 0 : nx.toFixed(3)}&pitch=${hoverMode ? 0 : ny.toFixed(3)}`).catch(()=>{});
+        } else {
+            throttleVal = hoverMode ? 0 : ny;
+            yawNorm     = hoverMode ? 0 : -nx;
+            fetch(serverUrl + `/joystick?yaw=${hoverMode ? 0 : nx.toFixed(3)}&throttle=${hoverMode ? 0 : ny.toFixed(3)}`).catch(()=>{});
+        }
     }
-},1000);
-
-/* ALTITUDE */
-setInterval(()=>{
-    altitude+=throttleValue*0.5;
-    if(altitude<0) altitude=0;
-    if(altitude>100) altitude=100;
-    document.getElementById("altitude").innerText=altitude.toFixed(1)+"m";
-    document.getElementById("altFill").style.width=altitude+"%";
-},200);
-
-/* SIGNAL */
-const bars=document.querySelectorAll(".signal-bars div");
-setInterval(()=>{
-    const strength=statusText.innerText==="CONNECTED"
-        ?Math.floor(Math.random()*4)+1
-        :0;
-    bars.forEach((bar,index)=>{
-        bar.style.opacity=index<strength?1:0.3;
-    });
-},800);
-
-/* JOYSTICKS */
-let roll=0;
-let pitch=0;
-
-function setupJoystick(baseId,knobId,axisX,axisY){
-    const base=document.getElementById(baseId);
-    const knob=document.getElementById(knobId);
-    let pointerId=null;
-    const max=70;
-
-    base.addEventListener("pointerdown",e=>{
-        pointerId=e.pointerId;
-        base.setPointerCapture(pointerId);
-    });
-
-    base.addEventListener("pointermove",e=>{
-        if(e.pointerId!==pointerId) return;
-        const rect=base.getBoundingClientRect();
-        let x=e.clientX-(rect.left+rect.width/2);
-        let y=e.clientY-(rect.top+rect.height/2);
-        const dist=Math.sqrt(x*x+y*y);
-        if(dist>max){
-            x=(x/dist)*max;
-            y=(y/dist)*max;
-        }
-        knob.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
-
-        if(axisX==="pitch"){
-            pitch=hoverMode?0:(-y/max)*80;
-            roll=hoverMode?0:(x/max);
-        }
-
-        if(axisX==="throttle"){
-            throttleValue=-y/max;
-        }
-
-        fetch(serverUrl+`/joystick?${axisX}=${x/max}&${axisY}=${-y/max}`);
-    });
-
-    base.addEventListener("pointerup",e=>{
-        if(e.pointerId!==pointerId) return;
-        pointerId=null;
-        knob.style.transform="translate(-50%,-50%)";
-        fetch(serverUrl+`/joystick?${axisX}=0&${axisY}=0`);
-        pitch=0;
-        roll=0;
-    });
 }
 
-setupJoystick("leftBase","leftKnob","pitch","roll");
-setupJoystick("rightBase","rightKnob","throttle","yaw");
+setupJoystick("leftBase",  "leftKnob",  "left");
+setupJoystick("rightBase", "rightKnob", "right");
 
-/* ARTIFICIAL HORIZON v4.4 */
-const canvas=document.getElementById("horizon");
-const ctx=canvas.getContext("2d");
+/* ── ARTIFICIAL HORIZON ─────────────────────────────── */
+const canvas = document.getElementById("horizon");
+const ctx    = canvas.getContext("2d");
 
 function resizeCanvas(){
-    canvas.width=canvas.offsetWidth;
-    canvas.height=canvas.offsetHeight;
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 }
 resizeCanvas();
-window.addEventListener("resize",resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 function drawHorizon(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const W  = canvas.width;
+    const H  = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
 
-    const cx=canvas.width/2;
-    const cy=canvas.height/2;
+    ctx.clearRect(0, 0, W, H);
+
+    const rollRad = (rollNorm + yawNorm) * (Math.PI / 4);
+    const pitchPx = pitchNorm * 60;
 
     ctx.save();
-    ctx.translate(cx,cy);
-    ctx.rotate(roll);
+    ctx.translate(cx, cy);
+    ctx.rotate(rollRad);
 
-    ctx.fillStyle="#000";
-    ctx.fillRect(-canvas.width*2,-canvas.height*2,canvas.width*4,canvas.height*4);
-
-    ctx.strokeStyle="#ffcc00";
-    ctx.lineWidth=3;
-    ctx.shadowBlur=25;
-    ctx.shadowColor="#ffcc00";
-
+    ctx.strokeStyle = "#ffcc00";
+    ctx.lineWidth   = 3;
+    ctx.shadowBlur  = 25;
+    ctx.shadowColor = "#ffcc00";
     ctx.beginPath();
-    ctx.moveTo(-canvas.width,pitch);
-    ctx.lineTo(canvas.width,pitch);
+    ctx.moveTo(-W, pitchPx);
+    ctx.lineTo( W, pitchPx);
     ctx.stroke();
 
-    ctx.lineWidth=2;
-    ctx.font="bold 14px Arial";
-    ctx.fillStyle="#ffcc00";
+    ctx.lineWidth  = 2;
+    ctx.font       = "bold 14px Arial";
+    ctx.fillStyle  = "#ffcc00";
+    ctx.shadowBlur = 8;
 
-    for(let i=-50;i<=50;i+=10){
-        let y=pitch+i*4;
+    for(let deg = -40; deg <= 40; deg += 10){
+        if(deg === 0) continue;
+        const py   = pitchPx - deg * 4;
+        const hlen = Math.abs(deg) % 20 === 0 ? 60 : 35;
         ctx.beginPath();
-        ctx.moveTo(-60,y);
-        ctx.lineTo(60,y);
+        ctx.moveTo(-hlen, py);
+        ctx.lineTo( hlen, py);
         ctx.stroke();
-        if(i!==0){
-            ctx.fillText(i,70,y+4);
-            ctx.fillText(i,-90,y+4);
-        }
+        ctx.fillText(deg,  hlen + 6, py + 4);
+        ctx.fillText(deg, -hlen - 26, py + 4);
     }
 
     ctx.restore();
 
-    ctx.strokeStyle="#ffcc00";
-    ctx.lineWidth=4;
-    ctx.shadowBlur=30;
+    ctx.strokeStyle = "#ffcc00";
+    ctx.lineWidth   = 4;
+    ctx.shadowBlur  = 30;
+    ctx.shadowColor = "#ffcc00";
 
     ctx.beginPath();
-    ctx.moveTo(cx-40,cy);
-    ctx.lineTo(cx-10,cy);
-    ctx.moveTo(cx+10,cy);
-    ctx.lineTo(cx+40,cy);
-    ctx.moveTo(cx,cy);
-    ctx.lineTo(cx,cy+15);
+    ctx.moveTo(cx-40, cy); ctx.lineTo(cx-10, cy);
+    ctx.moveTo(cx+10, cy); ctx.lineTo(cx+40, cy);
+    ctx.moveTo(cx, cy);    ctx.lineTo(cx, cy+15);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(cx,cy,canvas.width/2-25,Math.PI*1.1,Math.PI*1.9);
-    ctx.lineWidth=2;
+    ctx.arc(cx, cy, W/2 - 25, Math.PI*1.1, Math.PI*1.9);
+    ctx.lineWidth = 2;
     ctx.stroke();
+
+    ctx.shadowBlur = 0;
 
     requestAnimationFrame(drawHorizon);
 }
 drawHorizon();
+
+/* ── HEADLESS MODE ───────────────────────────────────── */
+let headlessMode = false;
+
+function toggleHeadless(){
+    headlessMode = !headlessMode;
+    const btn = document.getElementById("headBtn");
+    if(headlessMode){
+        btn.innerText         = "HEADLESS";
+        btn.style.borderColor = "#00ff44";
+        btn.style.color       = "#00ff44";
+        btn.style.boxShadow   = "0 0 12px #00ff44";
+        btn.style.background  = "#001a0a";
+    } else {
+        btn.innerText         = "HEADED";
+        btn.style.borderColor = "#ff3333";
+        btn.style.color       = "#ff3333";
+        btn.style.boxShadow   = "0 0 12px #ff3333";
+        btn.style.background  = "#1a0000";
+    }
+    fetch(serverUrl + "/command?cmd=" + (headlessMode ? "HEADLESS_ON" : "HEADLESS_OFF")).catch(()=>{});
+}
+
+/* ── FLIP ────────────────────────────────────────────── */
+let flipTimer = null;
+
+function doFlip(cmd){
+    const label    = cmd === "FLIP_FRONT" ? "⬆ FRONT FLIP" : "⬇ BACK FLIP";
+    const modeEl   = document.getElementById("mode");
+    const prevMode = modeEl.innerText;
+
+    modeEl.style.color = "#ffaa00";
+    modeEl.innerText   = label;
+
+    fetch(serverUrl + "/command?cmd=" + cmd)
+        .then(()=>{
+            modeEl.style.color = "#39ff7a";
+            modeEl.innerText   = label + " ✓";
+        })
+        .catch(()=>{
+            modeEl.style.color = "#ff4444";
+            modeEl.innerText   = label;
+        });
+
+    if(flipTimer) clearTimeout(flipTimer);
+    flipTimer = setTimeout(()=>{
+        modeEl.style.color = "white";
+        modeEl.innerText   = prevMode;
+    }, 2500);
+
+    fetch(serverUrl + "/command?cmd=" + cmd).catch(()=>{});
+}
+
+/* ── PHOTO ───────────────────────────────────────────── */
+function capturePhoto(){
+    const pc   = document.getElementById("photoCanvas");
+    const natW = 1600;
+    const natH = 1400;
+
+    pc.width  = natW;
+    pc.height = natH;
+
+    const pCtx = pc.getContext("2d");
+    pCtx.drawImage(videoEl, 0, 0, natW, natH);
+
+    pc.toBlob(blob=>{
+        if(!blob){ alert("Capture failed — is the stream active?"); return; }
+        const url = URL.createObjectURL(blob);
+        const a   = document.createElement("a");
+        a.href     = url;
+        a.download = "cyberhawk_photo_" + Date.now() + ".jpg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    }, "image/jpeg", 1.0);
+}
+
+/* ── RECORDING ───────────────────────────────────────── */
+let mediaRecorder  = null;
+let recordedChunks = [];
+let isRecording    = false;
+let recCanvas      = null;
+let recCtx         = null;
+let recRAF         = null;
+
+function toggleRecord(){
+    isRecording ? stopRecording() : startRecording();
+}
+
+function startRecording(){
+    recCanvas        = document.createElement("canvas");
+    recCanvas.width  = 480;
+    recCanvas.height = 240;
+    recCtx           = recCanvas.getContext("2d");
+
+    function drawRecFrame(){
+        if(!isRecording) return;
+        recCtx.drawImage(videoEl, 0, 0, 480, 240);
+        recRAF = requestAnimationFrame(drawRecFrame);
+    }
+
+    const canvasStream = recCanvas.captureStream(15);
+
+    const mimeTypes = [
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm",
+        "video/mp4"
+    ];
+    const mimeType = mimeTypes.find(m=>MediaRecorder.isTypeSupported(m)) || "";
+
+    recordedChunks = [];
+    try{
+        mediaRecorder = new MediaRecorder(canvasStream, mimeType ? {mimeType} : {});
+    } catch(err){
+        alert("Recording not supported on this browser.");
+        return;
+    }
+
+    mediaRecorder.ondataavailable = e=>{
+        if(e.data && e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = saveRecording;
+
+    isRecording = true;
+    drawRecFrame();
+    mediaRecorder.start(100);
+
+    const btn = document.getElementById("recordBtn");
+    btn.innerText = "⏹ STOP REC";
+    btn.classList.add("recording");
+}
+
+function stopRecording(){
+    isRecording = false;
+    cancelAnimationFrame(recRAF);
+    if(mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+
+    const btn = document.getElementById("recordBtn");
+    btn.innerText = "🔴 RECORD";
+    btn.classList.remove("recording");
+}
+
+function saveRecording(){
+    if(!recordedChunks.length) return;
+    const mime = mediaRecorder.mimeType || "video/webm";
+    const ext  = mime.includes("mp4") ? "mp4" : "webm";
+    const blob = new Blob(recordedChunks, {type: mime});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "cyberhawk_480x240_" + Date.now() + "." + ext;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 15000);
+    recordedChunks = [];
+}
+
+/* ── SIGNAL ENGINE ───────────────────────────────────── */
+let signalStrength           = 100;
+let signalWarning90Triggered = false;
+let signalWarning95Triggered = false;
+let signalAutoHoverTriggered = false;
+let warningInterval          = null;
+let signalDistance           = 0;
+let signalFadePhase          = 0;
+let signalBurst              = 0;
+
+setInterval(()=>{
+    if(!isConnected){
+        signalStrength           = 0;
+        signalWarning90Triggered = false;
+        signalWarning95Triggered = false;
+        signalAutoHoverTriggered = false;
+        document.getElementById("signalText").innerText    = "0%";
+        document.getElementById("signalText").style.color = "#ff3333";
+        clearRangeWarning();
+        return;
+    }
+
+    // Distance simulation
+    signalDistance += (throttleVal * 0.3) + (pitchNorm * 0.2);
+    signalDistance  = Math.max(0, Math.min(100, signalDistance));
+
+    // Multipath fading
+    signalFadePhase += 0.08;
+    const fadeFactor = Math.sin(signalFadePhase) * 4;
+
+    // Interference burst
+    if(signalBurst > 0){
+        signalBurst--;
+    } else if(Math.random() < 0.04){
+        signalBurst = Math.floor(Math.random() * 5) + 2;
+    }
+    const burstDrop = signalBurst > 0 ? Math.random() * 18 : 0;
+
+    // Base signal with inverse square degradation
+    const baseSignal = 100 - (signalDistance * 0.55);
+    const noise      = (Math.random() * 4) - 2;
+
+    signalStrength = baseSignal + fadeFactor - burstDrop + noise;
+    signalStrength = Math.min(100, Math.max(0, signalStrength));
+
+    const pct = Math.round(signalStrength);
+    const el  = document.getElementById("signalText");
+    el.innerText = pct + "%";
+
+    // Color based on signal loss
+    const loss = 100 - pct;
+    if(loss >= 15)      el.style.color = "#ffcc00";
+    else if(loss >= 10) el.style.color = "#ff8800";
+    else if(loss >= 5)  el.style.color = "#ff3333";
+    else                el.style.color = "#ffcc00";
+
+    // Range warnings
+    const rangePct = 100 - pct;
+
+    if(rangePct >= 90 && rangePct < 95 && !signalWarning90Triggered){
+        signalWarning90Triggered = true;
+        triggerRangeWarning("⚠️ RANGE WARNING — 90%", "#ff8800", "0 0 20px #ff8800");
+        vibrateDevice([200, 100, 200]);
+    }
+
+    if(rangePct >= 95 && rangePct < 98 && !signalWarning95Triggered){
+        signalWarning95Triggered = true;
+        triggerRangeWarning("🚨 CRITICAL RANGE — 95%", "#ff3333", "0 0 25px #ff3333");
+        vibrateDevice([300, 100, 300, 100, 300]);
+    }
+
+    if(rangePct >= 98 && !signalAutoHoverTriggered){
+        signalAutoHoverTriggered = true;
+        hoverMode = true;
+        document.getElementById("mode").innerText = "AUTO HOVER";
+        sendCommand("HOVER");
+        triggerRangeWarning("🛑 AUTO HOVER ENGAGED — 98% RANGE", "#ff0000", "0 0 30px #ff0000");
+        vibrateDevice([500, 200, 500, 200, 500, 200, 500]);
+    }
+
+    if(rangePct < 88){
+        signalWarning90Triggered = false;
+        signalWarning95Triggered = false;
+        signalAutoHoverTriggered = false;
+        clearRangeWarning();
+    }
+
+}, 800);
+
+/* ── WARNING BANNER ──────────────────────────────────── */
+function triggerRangeWarning(message, color, shadow){
+    clearRangeWarning();
+
+    let banner = document.getElementById("rangeBanner");
+    if(!banner){
+        banner = document.createElement("div");
+        banner.id = "rangeBanner";
+        banner.style.cssText = `
+            position:fixed;
+            top:60px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:9999;
+            padding:12px 28px;
+            border-radius:14px;
+            border:2px solid ${color};
+            background:rgba(0,0,0,0.88);
+            font-size:15px;
+            font-weight:bold;
+            letter-spacing:1.5px;
+            text-align:center;
+            pointer-events:none;
+        `;
+        document.body.appendChild(banner);
+    }
+
+    banner.innerText         = message;
+    banner.style.color       = color;
+    banner.style.borderColor = color;
+    banner.style.boxShadow   = shadow;
+
+    let flashOn = true;
+    warningInterval = setInterval(()=>{
+        banner.style.opacity = flashOn ? "1" : "0.35";
+        flashOn = !flashOn;
+    }, 500);
+}
+
+function clearRangeWarning(){
+    if(warningInterval){ clearInterval(warningInterval); warningInterval = null; }
+    const banner = document.getElementById("rangeBanner");
+    if(banner) banner.remove();
+}
+
+/* ── VIBRATION ───────────────────────────────────────── */
+function vibrateDevice(pattern){
+    if("vibrate" in navigator){
+        navigator.vibrate(pattern);
+    }
+}
 </script>
 
 </body>
-        </html>
+</html>
