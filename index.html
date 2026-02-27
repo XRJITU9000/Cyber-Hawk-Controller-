@@ -510,27 +510,7 @@ function drawHorizon(){
 }
 drawHorizon();
 
-/* ── HEADLESS MODE ───────────────────────────────────── */
-let headlessMode = false;
 
-function toggleHeadless(){
-    headlessMode = !headlessMode;
-    const btn = document.getElementById("headBtn");
-    if(headlessMode){
-        btn.innerText         = "HEADLESS";
-        btn.style.borderColor = "#00ff44";
-        btn.style.color       = "#00ff44";
-        btn.style.boxShadow   = "0 0 12px #00ff44";
-        btn.style.background  = "#001a0a";
-    } else {
-        btn.innerText         = "HEADED";
-        btn.style.borderColor = "#ff3333";
-        btn.style.color       = "#ff3333";
-        btn.style.boxShadow   = "0 0 12px #ff3333";
-        btn.style.background  = "#1a0000";
-    }
-    fetch(serverUrl + "/command?cmd=" + (headlessMode ? "HEADLESS_ON" : "HEADLESS_OFF")).catch(()=>{});
-}
 
 /* ── FLIP ────────────────────────────────────────────── */
 let flipTimer = null;
