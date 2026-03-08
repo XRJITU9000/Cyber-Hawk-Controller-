@@ -218,7 +218,7 @@ button.recording{
 <div class="button-row">
     <button onclick="sendCommand('ARM')">ARM</button>
     <button onclick="sendCommand('DISARM')">DISARM</button>
-    <button onclick="sendCommand('LED')">LED</button>
+    <button id="ledBtn" onclick="toggleLED()">LED</button>
     <button onclick="sendCommand('HOVER')">HOVER</button>
     <button onclick="sendCommand('RTH')">RTH</button>
 </div>
@@ -260,10 +260,33 @@ button.recording{
 <canvas id="photoCanvas" style="display:none;"></canvas>
 
 <script>
+    
+//─LED BUTTON──────────────────────
+    let ledState = false;
+
+function toggleLED(){
+
+    ledState = !ledState;
+
+    const btn = document.getElementById("ledBtn");
+
+    if(ledState){
+        btn.style.borderColor = "#39ff7a";
+        btn.style.color = "#39ff7a";
+    }else{
+        btn.style.borderColor = "#ffcc00";
+        btn.style.color = "white";
+    }
+
+    const state = ledState ? "on" : "off";
+
+    fetch(serverUrl + "/led?state=" + state).catch(()=>{});
+
+}
 // ── SERVER URLs ──────────────────────────────────────────
 // ESP32-CAM hosts both stream (port 81) and commands (port 80)
 const serverUrl   = "http://192.168.4.1";
-const streamUrl   = "http://192.168.4.1:81/stream";
+const streamUrl   = "http://192.168.4.1/stream";
 const videoEl     = document.getElementById("stream");
 
 /* ── STREAM ─────────────────────────────────────────── */
