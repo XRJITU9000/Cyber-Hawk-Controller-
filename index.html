@@ -195,7 +195,7 @@ button.recording{
             <div id="statusText">DISCONNECTED</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;border:2px solid #ffcc00;padding:4px 10px;border-radius:10px;box-shadow:0 0 10px #ffcc00;font-size:13px;">
-            📡 <span id="signalText">0%</span>
+            📡 <span id="signalStrength">0%</span>
         </div>
     </div>
 </div>
@@ -260,6 +260,22 @@ button.recording{
 <canvas id="photoCanvas" style="display:none;"></canvas>
 
 <script>
+
+//─SIGNAL STRENGTH──────────────────────
+    function updateSignal(){
+
+fetch(serverUrl + "/signal")
+.then(response => response.json())
+.then(data => {
+
+document.getElementById("signalStrength").innerText =
+data.signal + "%";
+
+});
+
+}
+
+setInterval(updateSignal,500);
     
 //─LED BUTTON──────────────────────
     let ledState = false;
